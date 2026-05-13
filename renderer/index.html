@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>斗地主</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <div id="title-screen">
+    <div class="title-shell">
+      <div class="title-brand">
+        <div class="title-kicker">经典单机牌局</div>
+        <h1>斗地主</h1>
+        <div class="title-subtitle">叫分、抢地主、炸弹翻倍，一局定胜负</div>
+      </div>
+      <div class="title-card-fan" aria-hidden="true">
+        <div class="title-card red">♥</div>
+        <div class="title-card black">♠</div>
+        <div class="title-card gold">王</div>
+      </div>
+      <div class="title-menu">
+        <button class="title-btn primary" id="title-start">开始游戏</button>
+        <button class="title-btn" id="title-settings">设置</button>
+        <button class="title-btn" id="title-achievements">成就</button>
+        <button class="title-btn danger" id="title-exit">退出游戏</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="table">
+    <!-- Top Bar -->
+    <div id="top-bar">
+      <span class="phase-label" id="phase-label">准备开始</span>
+      <div class="nav-btns">
+        <button class="nav-btn" id="btn-new-game" style="display:none">🔄 新一局</button>
+        <button class="nav-btn" id="btn-settings">⚙ 设置</button>
+        <button class="nav-btn" id="btn-achievements">🏆 成就</button>
+        <button class="nav-btn" id="btn-mute">🔊</button>
+      </div>
+    </div>
+
+    <!-- Main Play Area -->
+    <div id="play-area">
+
+      <!-- AI Player 2 (top) -->
+      <div class="player-area top" id="ai-area-2">
+        <div class="player-info">
+          <span class="player-name">电脑B</span>
+          <span class="player-badge farmer" style="display:none">农民</span>
+          <span class="player-score">积分: 0</span>
+        </div>
+        <div class="player-cards-area ai-hand"></div>
+        <span class="player-card-count">剩余: 17张</span>
+        <div class="turn-indicator" style="display:none"></div>
+      </div>
+
+      <!-- Center Area -->
+      <div id="center-area">
+        <!-- AI Player 1 (left) -->
+        <div class="player-area left" id="ai-area-1">
+          <div class="player-info" style="flex-direction:column;gap:4px;">
+            <span class="player-name">电脑A</span>
+            <span class="player-badge farmer" style="display:none">农民</span>
+            <span class="player-score">积分: 0</span>
+          </div>
+          <div class="player-cards-area ai-hand"></div>
+          <span class="player-card-count">剩余: 17张</span>
+          <div class="turn-indicator" style="display:none"></div>
+        </div>
+
+        <!-- Play Zone -->
+        <div id="play-zone">
+          <div class="play-slot" id="play-slot-1">
+            <div class="play-slot-label">电脑A</div>
+          </div>
+          <div class="play-slot" id="play-slot-2">
+            <div class="play-slot-label">电脑B</div>
+          </div>
+          <div class="play-slot" id="play-slot-0">
+            <div class="play-slot-label">你</div>
+          </div>
+        </div>
+
+        <!-- Landlord Cards -->
+        <div id="landlord-card-zone">
+          <span class="zone-label">底牌</span>
+          <div id="landlord-cards"></div>
+        </div>
+      </div>
+
+      <!-- Human Player (bottom) -->
+      <div class="player-area bottom" id="human-area">
+        <div class="player-info">
+          <span class="player-name">你</span>
+          <span class="player-badge farmer" style="display:none">农民</span>
+          <span class="player-score" id="human-score">积分: 0</span>
+        </div>
+        <div id="human-hand"></div>
+        <div class="turn-indicator" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div id="controls">
+      <!-- Bidding controls -->
+      <div id="bid-controls" style="display:none;gap:12px;">
+        <button class="bid-btn danger" id="btn-bid-0">不叫</button>
+        <button class="bid-btn" id="btn-bid-1">1分</button>
+        <button class="bid-btn" id="btn-bid-2">2分</button>
+        <button class="bid-btn primary" id="btn-bid-3">3分</button>
+      </div>
+      <!-- Play controls -->
+      <div id="play-controls" style="display:none;gap:12px;">
+        <button id="btn-sort-hand">理牌</button>
+        <button class="danger" id="btn-pass">不出</button>
+        <button id="btn-hint">提示</button>
+        <button class="primary" id="btn-play">出牌</button>
+      </div>
+    </div>
+
+    <!-- Message Toast -->
+    <div id="message-toast"></div>
+  </div>
+
+  <!-- Achievement Toast Container -->
+  <div id="achieve-toast-container"></div>
+
+  <!-- Game Over Modal -->
+  <div class="modal-overlay" id="game-over-modal">
+    <div id="game-over-content">
+      <h2 id="result-title"></h2>
+      <div class="result-detail" id="result-detail"></div>
+      <div class="result-score" id="result-score"></div>
+      <button id="btn-restart">再来一局</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-content">
+      <h3>⚙ 设置</h3>
+      <label>
+        AI难度
+        <select id="setting-difficulty">
+          <option value="0">简单</option>
+          <option value="1" selected>中等</option>
+          <option value="2">困难</option>
+        </select>
+      </label>
+      <label>
+        音效音量
+        <input type="range" id="setting-sfx" min="0" max="1" step="0.1" value="0.7">
+      </label>
+      <label>
+        背景音乐音量
+        <input type="range" id="setting-bgm" min="0" max="1" step="0.1" value="0.4">
+      </label>
+      <div class="settings-actions">
+        <button type="button" id="btn-toggle-fullscreen">窗口化/全屏</button>
+        <button type="button" id="btn-settings-exit-game">退出游戏</button>
+      </div>
+      <button class="close-btn">关闭</button>
+    </div>
+  </div>
+
+  <!-- Achievements Modal -->
+  <div class="modal-overlay" id="achievements-modal">
+    <div class="modal-content">
+      <h3>🏆 成就</h3>
+      <div id="achievements-list"></div>
+      <button class="close-btn">关闭</button>
+    </div>
+  </div>
+
+  <!-- Scripts (dependency order) -->
+  <script src="js/constants.js"></script>
+  <script src="js/cardUtils.js"></script>
+  <script src="js/deck.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/ui.js"></script>
+
+  <script>
+    // ── Bootstrap ────────────────────────────────────────
+    (async function() {
+      try {
+        const game = new Game();
+        const sound = new SoundManager();
+        const achievements = new AchievementManager();
+        const ui = new UIManager();
+
+        // Load persisted data
+        await game.init(await Store.loadSettings());
+        await achievements.init();
+
+        // Initialize sound on first user interaction + start BGM
+        document.addEventListener('click', function initSound() {
+          sound.init();
+          // Start BGM if game is running and not muted
+          if (!sound.muted && (game.phase === GamePhase.BIDDING || game.phase === GamePhase.PLAYING)) {
+            sound.playBGM();
+          }
+          document.removeEventListener('click', initSound);
+        }, { once: true });
+
+        // Wire everything together
+        ui.init(game, sound, achievements);
+
+        // Load settings into UI controls (must be after init)
+        await ui._loadSettingsUI();
+
+        // Wait for the title screen start button before dealing.
+        ui.showTitleScreen();
+      } catch (e) {
+        // Show error visibly
+        const toast = document.getElementById('message-toast');
+        if (toast) {
+          toast.textContent = '初始化失败: ' + e.message;
+          toast.classList.add('show');
+          toast.style.color = '#ff4444';
+        }
+        console.error('Game init error:', e);
+      }
+    })();
+  </script>
+</body>
+</html>

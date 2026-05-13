@@ -1,0 +1,32 @@
+{
+  "name": "fight-landlord",
+  "version": "1.0.0",
+  "description": "斗地主单机版 - 经典斗地主桌面游戏",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.fightlandlord.app",
+    "productName": "斗地主",
+    "directories": {
+      "output": "build"
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerLanguages": ["zh_CN", "en_US"],
+      "shortcutName": "斗地主"
+    }
+  }
+}
