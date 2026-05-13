@@ -1,7 +1,7 @@
 {
   "name": "fight-landlord",
   "version": "1.0.0",
-  "description": "斗地主单机版 - 经典斗地主桌面游戏",
+  "description": "A polished single-player Fight the Landlord desktop game built with Electron.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
